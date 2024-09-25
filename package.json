@@ -1,7 +1,7 @@
 {
   "name": "sae-web-app",
   "version": "1.0.0",
-  "description": "Simple web app for SAE",
+  "description": "Web app deployed on Alibaba Cloud SAE",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
