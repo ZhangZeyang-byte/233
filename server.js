@@ -19,6 +19,12 @@ app.get('/page3', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index3.html'));
 });
 
+// 处理 404 错误
+app.use((req, res) => {
+  res.status(404).send('页面未找到');
+});
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
+  console.log(`Application is accessible at https://cn-shenductlist-mjhpteeeqg.cn-shenzhen.sae.run/`);
 });
