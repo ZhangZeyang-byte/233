@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>高性能产品图片展示 (7000张图片，优化目录交互)</title>
+  <title>高性能产品图片展示 (东华产品)</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -139,19 +139,20 @@
     const mainContent = document.getElementById('main-content');
     const productContainer = document.getElementById('product-container');
 
-    const TOTAL_PRODUCTS = 7000;
-    const TOTAL_CATEGORIES = 40;
-    const PRODUCTS_PER_CATEGORY = Math.ceil(TOTAL_PRODUCTS / TOTAL_CATEGORIES);
+    const TOTAL_PRODUCTS = 3; // 根据实际产品数量调整
+    const TOTAL_CATEGORIES = 1; // 只有一个类别 "东华"
+    const PRODUCTS_PER_CATEGORY = TOTAL_PRODUCTS;
     const PRODUCTS_PER_ROW = 7;
     const PRODUCT_HEIGHT = 250; // 预估每个产品的高度
 
+    // 阿里云OSS图片URL前缀
+    const OSS_URL_PREFIX = 'https://productlist-1.oss-cn-shenzhen.aliyuncs.com/%E4%B8%9C%E5%8D%8E/';
+
     // 生成目录
-    for (let i = 1; i <= TOTAL_CATEGORIES; i++) {
-      const li = document.createElement('li');
-      li.textContent = `类别 ${i}`;
-      li.dataset.category = i;
-      categoryList.appendChild(li);
-    }
+    const li = document.createElement('li');
+    li.textContent = '东华';
+    li.dataset.category = 1;
+    categoryList.appendChild(li);
 
     const categories = categoryList.querySelectorAll('li');
 
@@ -165,10 +166,10 @@
     function createProductElement(index) {
       const product = document.createElement('div');
       product.className = 'product';
-      product.dataset.category = Math.ceil((index + 1) / PRODUCTS_PER_CATEGORY);
+      product.dataset.category = 1;
       product.innerHTML = `
-        <img src="https://picsum.photos/200/200?random=${index + 1}" alt="产品 ${index + 1}" loading="lazy">
-        <h3>产品 ${index + 1}</h3>
+        <img src="${OSS_URL_PREFIX}${index + 1}.jpg" alt="东华产品 ${index + 1}" loading="lazy">
+        <h3>东华产品 ${index + 1}</h3>
         <p>¥${(Math.random() * 1000).toFixed(2)}</p>
       `;
       return product;
@@ -193,16 +194,7 @@
 
     // 更新活动类别
     function updateActiveCategory() {
-      const scrollPercentage = mainContent.scrollTop / (mainContent.scrollHeight - mainContent.clientHeight);
-      const activeCategoryIndex = Math.floor(scrollPercentage * TOTAL_CATEGORIES);
-
-      categories.forEach((category, index) => {
-        if (index === activeCategoryIndex) {
-          category.classList.add('active');
-        } else {
-          category.classList.remove('active');
-        }
-      });
+      categories[0].classList.add('active');
     }
 
     // 初始化
@@ -212,32 +204,11 @@
     mainContent.addEventListener('scroll', updateVisibleProducts);
 
     // 优化目录交互
-    let isScrolling = false;
-    categories.forEach((category, index) => {
-      category.addEventListener('mouseenter', () => {
-        if (!isScrolling) {
-          categories.forEach(c => c.classList.remove('active'));
-          category.classList.add('active');
-        }
+    categories[0].addEventListener('click', () => {
+      mainContent.scrollTo({
+        top: 0,
+        behavior: 'smooth'
       });
-
-      category.addEventListener('click', () => {
-        isScrolling = true;
-        const scrollTarget = (index / TOTAL_CATEGORIES) * (mainContent.scrollHeight - mainContent.clientHeight);
-        mainContent.scrollTo({
-          top: scrollTarget,
-          behavior: 'smooth'
-        });
-        setTimeout(() => {
-          isScrolling = false;
-        }, 1000); // 假设滚动动画大约需要1秒
-      });
-    });
-
-    categoryList.addEventListener('mouseleave', () => {
-      if (!isScrolling) {
-        updateActiveCategory();
-      }
     });
 
     toggleButton.addEventListener('click', () => {
@@ -256,4 +227,3 @@
   </script>
 </body>
 </html>
-
