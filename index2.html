@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>高性能产品图片展示 (东华产品)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      background-color: #f0f0f0;
+    }
+    .container {
+      width: 1400px;
+      display: flex;
+      position: relative;
+    }
+    .main-content {
+      flex-grow: 1;
+      padding: 20px;
+      height: 100vh;
+      overflow-y: auto;
+      position: relative;
+    }
+    .product-container {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 20px;
+    }
+    .product {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+      background-color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+    .product:hover {
+      transform: translateY(-5px);
+    }
+    .product img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 5px;
+    }
+    .product h3 {
+      margin: 10px 0;
+      font-size: 14px;
+    }
+    .product p {
+      color: #e4393c;
+      font-weight: bold;
+    }
+    .sidebar {
+      width: 200px;
+      background-color: #f1f1f1;
+      padding: 20px;
+      height: 100vh;
+      overflow-y: auto;
+      position: fixed;
+      left: -240px;
+      top: 0;
+      transition: left 0.3s ease;
+      z-index: 1000;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    }
+    .sidebar.active {
+      left: 0;
+    }
+    .sidebar h2 {
+      margin-top: 0;
+    }
+    .sidebar ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    .sidebar li {
+      margin-bottom: 10px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+    .sidebar li:hover {
+      background-color: #e4393c;
+      color: white;
+    }
+    .sidebar li.active {
+      background-color: #e4393c;
+      color: white;
+      font-weight: bold;
+    }
+    .float-button {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 70px;
+      height: 70px;
+      background-color: #e4393c;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 32px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      z-index: 1001;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    .float-button:hover {
+      background-color: #c13030;
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="sidebar" id="sidebar">
+      <h2>目录</h2>
+      <ul id="category-list"></ul>
+    </div>
+    <div class="main-content" id="main-content">
+      <div class="product-container" id="product-container"></div>
+    </div>
+  </div>
+  <button class="float-button" id="toggleButton">☰</button>
+
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    const categoryList = document.getElementById('category-list');
+    const toggleButton = document.getElementById('toggleButton');
+    const mainContent = document.getElementById('main-content');
+    const productContainer = document.getElementById('product-container');
+
+    const TOTAL_PRODUCTS = 3; // 根据实际产品数量调整
+    const TOTAL_CATEGORIES = 1; // 只有一个类别 "东华"
+    const PRODUCTS_PER_CATEGORY = TOTAL_PRODUCTS;
+    const PRODUCTS_PER_ROW = 7;
+    const PRODUCT_HEIGHT = 250; // 预估每个产品的高度
+
+    // 阿里云OSS图片URL前缀
+    const OSS_URL_PREFIX = 'https://productlist-1.oss-cn-shenzhen.aliyuncs.com/%E4%B8%9C%E5%8D%8E/';
+
+    // 生成目录
+    const li = document.createElement('li');
+    li.textContent = '东华';
+    li.dataset.category = 1;
+    categoryList.appendChild(li);
+
+    const categories = categoryList.querySelectorAll('li');
+
+    // 虚拟滚动相关变量
+    let startIndex = 0;
+    let endIndex = 0;
+    const visibleRows = Math.ceil(window.innerHeight / PRODUCT_HEIGHT) + 1;
+    const visibleProducts = visibleRows * PRODUCTS_PER_ROW;
+
+    // 创建产品元素
+    function createProductElement(index) {
+      const product = document.createElement('div');
+      product.className = 'product';
+      product.dataset.category = 1;
+      product.innerHTML = `
+        <img src="${OSS_URL_PREFIX}${index + 1}.jpg" alt="东华产品 ${index + 1}" loading="lazy">
+        <h3>东华产品 ${index + 1}</h3>
+        <p>¥${(Math.random() * 1000).toFixed(2)}</p>
+      `;
+      return product;
+    }
+
+    // 更新可见产品
+    function updateVisibleProducts() {
+      const scrollTop = mainContent.scrollTop;
+      startIndex = Math.floor(scrollTop / PRODUCT_HEIGHT) * PRODUCTS_PER_ROW;
+      endIndex = Math.min(startIndex + visibleProducts, TOTAL_PRODUCTS);
+
+      productContainer.innerHTML = '';
+      productContainer.style.paddingTop = `${startIndex / PRODUCTS_PER_ROW * PRODUCT_HEIGHT}px`;
+      productContainer.style.paddingBottom = `${(TOTAL_PRODUCTS - endIndex) / PRODUCTS_PER_ROW * PRODUCT_HEIGHT}px`;
+
+      for (let i = startIndex; i < endIndex; i++) {
+        productContainer.appendChild(createProductElement(i));
+      }
+
+      updateActiveCategory();
+    }
+
+    // 更新活动类别
+    function updateActiveCategory() {
+      categories[0].classList.add('active');
+    }
+
+    // 初始化
+    updateVisibleProducts();
+
+    // 事件监听
+    mainContent.addEventListener('scroll', updateVisibleProducts);
+
+    // 优化目录交互
+    categories[0].addEventListener('click', () => {
+      mainContent.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+
+    toggleButton.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+
+    // 窗口大小变化时重新计算
+    window.addEventListener('resize', () => {
+      const newVisibleRows = Math.ceil(window.innerHeight / PRODUCT_HEIGHT) + 1;
+      if (newVisibleRows !== visibleRows) {
+        visibleRows = newVisibleRows;
+        visibleProducts = visibleRows * PRODUCTS_PER_ROW;
+        updateVisibleProducts();
+      }
+    });
+  </script>
+</body>
+</html>
