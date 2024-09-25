@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const app = express();
-const port = process.env.PORT || 80;
+const port = process.env.PORT || 80;  // 使用环境变量 PORT，如果没有则默认为 80
 
 // 静态文件服务
 app.use(express.static(path.join(__dirname, 'public')));
