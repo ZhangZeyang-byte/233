@@ -1,7 +1,7 @@
 {
-  "name": "sae-web-app",
+  "name": "sae-nodejs-app",
   "version": "1.0.0",
-  "description": "Web app deployed on Alibaba Cloud SAE",
+  "description": "Node.js application for Alibaba Cloud SAE",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -10,6 +10,6 @@
     "express": "^4.17.1"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=14.0.0"
   }
 }
