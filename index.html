@@ -3,227 +3,234 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>高性能产品图片展示 (东华产品)</title>
+  <title>图片爱心覆盖交互页面</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      background-color: #f0f0f0;
-    }
-    .container {
-      width: 1400px;
-      display: flex;
-      position: relative;
-    }
-    .main-content {
-      flex-grow: 1;
-      padding: 20px;
-      height: 100vh;
-      overflow-y: auto;
-      position: relative;
-    }
-    .product-container {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 20px;
-    }
-    .product {
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 10px;
-      text-align: center;
-      background-color: white;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      transition: transform 0.3s ease;
-    }
-    .product:hover {
-      transform: translateY(-5px);
-    }
-    .product img {
-      width: 100%;
-      height: 150px;
-      object-fit: cover;
-      border-radius: 5px;
-    }
-    .product h3 {
-      margin: 10px 0;
-      font-size: 14px;
-    }
-    .product p {
-      color: #e4393c;
-      font-weight: bold;
-    }
-    .sidebar {
-      width: 200px;
-      background-color: #f1f1f1;
-      padding: 20px;
-      height: 100vh;
-      overflow-y: auto;
-      position: fixed;
-      left: -240px;
-      top: 0;
-      transition: left 0.3s ease;
-      z-index: 1000;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-    }
-    .sidebar.active {
-      left: 0;
-    }
-    .sidebar h2 {
-      margin-top: 0;
-    }
-    .sidebar ul {
-      list-style-type: none;
-      padding: 0;
-    }
-    .sidebar li {
-      margin-bottom: 10px;
-      transition: all 0.2s ease;
+    .heart-overlay {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 24px;
       cursor: pointer;
-      padding: 5px 10px;
-      border-radius: 5px;
-    }
-    .sidebar li:hover {
-      background-color: #e4393c;
-      color: white;
-    }
-    .sidebar li.active {
-      background-color: #e4393c;
-      color: white;
-      font-weight: bold;
-    }
-    .float-button {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      width: 70px;
-      height: 70px;
-      background-color: #e4393c;
-      color: white;
-      border: none;
+      user-select: none;
+      transition: color 0.3s;
+      background-color: rgba(255, 255, 255, 0.7);
       border-radius: 50%;
-      font-size: 32px;
-      cursor: pointer;
+      width: 36px;
+      height: 36px;
       display: flex;
       justify-content: center;
       align-items: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      z-index: 1001;
-      transition: background-color 0.3s ease, transform 0.3s ease;
+      z-index: 10;
     }
-    .float-button:hover {
-      background-color: #c13030;
-      transform: scale(1.1);
+    .circle {
+      width: 80px;
+      height: 80px;
+      background-color: pink;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      font-size: 14px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+    .count {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background-color: red;
+      color: white;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1001;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 90%;
+      max-width: 600px;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .modal-title {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .selected-images {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+    .selected-images img {
+      width: calc(33.333% - 7px);
+      max-width: 150px;
+      height: auto;
+      object-fit: cover;
+      border-radius: 5px;
+    }
+    .download-btn {
+      display: block;
+      margin: 20px auto 0;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .download-btn:hover {
+      background-color: #45a049;
+    }
+    @media (max-width: 600px) {
+      .selected-images img {
+        width: calc(50% - 5px);
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="sidebar" id="sidebar">
-      <h2>目录</h2>
-      <ul id="category-list"></ul>
-    </div>
-    <div class="main-content" id="main-content">
-      <div class="product-container" id="product-container"></div>
+  <div class="circle" id="reportButton">
+    已选款
+    <span class="count">0</span>
+  </div>
+
+  <div id="reportModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 class="modal-title">已选款报表</h2>
+      <div class="selected-images" id="selectedImages"></div>
+      <button class="download-btn" id="downloadBtn">下载报表</button>
     </div>
   </div>
-  <button class="float-button" id="toggleButton">☰</button>
 
   <script>
-    const sidebar = document.getElementById('sidebar');
-    const categoryList = document.getElementById('category-list');
-    const toggleButton = document.getElementById('toggleButton');
-    const mainContent = document.getElementById('main-content');
-    const productContainer = document.getElementById('product-container');
+    document.addEventListener('DOMContentLoaded', function() {
+      const targetContainer = document.querySelector('.elementor-element-9beee10');
+      const count = document.querySelector('.count');
+      const reportButton = document.getElementById('reportButton');
+      const modal = document.getElementById('reportModal');
+      const closeBtn = document.querySelector('.close');
+      const selectedImagesContainer = document.getElementById('selectedImages');
+      const downloadBtn = document.getElementById('downloadBtn');
+      let selectedCount = 0;
 
-    const TOTAL_PRODUCTS = 3; // 根据实际产品数量调整
-    const TOTAL_CATEGORIES = 1; // 只有一个类别 "东华"
-    const PRODUCTS_PER_CATEGORY = TOTAL_PRODUCTS;
-    const PRODUCTS_PER_ROW = 7;
-    const PRODUCT_HEIGHT = 250; // 预估每个产品的高度
+      function addHeartOverlays() {
+        if (!targetContainer) {
+          console.error('Target container not found');
+          return;
+        }
 
-    // 阿里云OSS图片URL前缀
-    const OSS_URL_PREFIX = 'https://productlist-1.oss-cn-shenzhen.aliyuncs.com/%E4%B8%9C%E5%8D%8E/';
+        const images = targetContainer.querySelectorAll('img');
+        images.forEach((img, index) => {
+          const parent = img.parentElement;
+          parent.style.position = 'relative';
 
-    // 生成目录
-    const li = document.createElement('li');
-    li.textContent = '东华';
-    li.dataset.category = 1;
-    categoryList.appendChild(li);
+          const heart = document.createElement('span');
+          heart.className = 'heart-overlay';
+          heart.innerHTML = '&#9825;';
+          heart.dataset.selected = 'false';
+          parent.appendChild(heart);
 
-    const categories = categoryList.querySelectorAll('li');
-
-    // 虚拟滚动相关变量
-    let startIndex = 0;
-    let endIndex = 0;
-    const visibleRows = Math.ceil(window.innerHeight / PRODUCT_HEIGHT) + 1;
-    const visibleProducts = visibleRows * PRODUCTS_PER_ROW;
-
-    // 创建产品元素
-    function createProductElement(index) {
-      const product = document.createElement('div');
-      product.className = 'product';
-      product.dataset.category = 1;
-      product.innerHTML = `
-        <img src="${OSS_URL_PREFIX}${index + 1}.jpg" alt="东华产品 ${index + 1}" loading="lazy">
-        <h3>东华产品 ${index + 1}</h3>
-        <p>¥${(Math.random() * 1000).toFixed(2)}</p>
-      `;
-      return product;
-    }
-
-    // 更新可见产品
-    function updateVisibleProducts() {
-      const scrollTop = mainContent.scrollTop;
-      startIndex = Math.floor(scrollTop / PRODUCT_HEIGHT) * PRODUCTS_PER_ROW;
-      endIndex = Math.min(startIndex + visibleProducts, TOTAL_PRODUCTS);
-
-      productContainer.innerHTML = '';
-      productContainer.style.paddingTop = `${startIndex / PRODUCTS_PER_ROW * PRODUCT_HEIGHT}px`;
-      productContainer.style.paddingBottom = `${(TOTAL_PRODUCTS - endIndex) / PRODUCTS_PER_ROW * PRODUCT_HEIGHT}px`;
-
-      for (let i = startIndex; i < endIndex; i++) {
-        productContainer.appendChild(createProductElement(i));
+          heart.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const isSelected = this.dataset.selected === 'true';
+            
+            if (isSelected) {
+              this.innerHTML = '&#9825;';
+              this.style.color = 'black';
+              this.dataset.selected = 'false';
+              selectedCount--;
+            } else {
+              this.innerHTML = '&#10084;';
+              this.style.color = 'red';
+              this.dataset.selected = 'true';
+              selectedCount++;
+            }
+            
+            updateCount();
+          });
+        });
       }
 
-      updateActiveCategory();
-    }
+      function updateCount() {
+        count.textContent = selectedCount;
+      }
 
-    // 更新活动类别
-    function updateActiveCategory() {
-      categories[0].classList.add('active');
-    }
+      reportButton.addEventListener('click', showReport);
+      closeBtn.addEventListener('click', closeModal);
+      window.addEventListener('click', outsideClick);
 
-    // 初始化
-    updateVisibleProducts();
+      function showReport() {
+        selectedImagesContainer.innerHTML = '';
+        const selectedHearts = document.querySelectorAll('.heart-overlay[data-selected="true"]');
+        selectedHearts.forEach(heart => {
+          const img = heart.closest('div').querySelector('img');
+          const clone = img.cloneNode(true);
+          selectedImagesContainer.appendChild(clone);
+        });
 
-    // 事件监听
-    mainContent.addEventListener('scroll', updateVisibleProducts);
+        modal.style.display = 'block';
+      }
 
-    // 优化目录交互
-    categories[0].addEventListener('click', () => {
-      mainContent.scrollTo({
-        top: 0,
-        behavior: 'smooth'
+      function closeModal() {
+        modal.style.display = 'none';
+      }
+
+      function outsideClick(e) {
+        if (e.target == modal) {
+          modal.style.display = 'none';
+        }
+      }
+
+      downloadBtn.addEventListener('click', function() {
+        html2canvas(document.querySelector('.modal-content')).then(canvas => {
+          const link = document.createElement('a');
+          link.download = '已选款报表.png';
+          link.href = canvas.toDataURL();
+          link.click();
+        }).catch(error => {
+          console.error('Error generating report:', error);
+          alert('生成报表时出错。请稍后再试。');
+        });
       });
-    });
 
-    toggleButton.addEventListener('click', () => {
-      sidebar.classList.toggle('active');
-    });
-
-    // 窗口大小变化时重新计算
-    window.addEventListener('resize', () => {
-      const newVisibleRows = Math.ceil(window.innerHeight / PRODUCT_HEIGHT) + 1;
-      if (newVisibleRows !== visibleRows) {
-        visibleRows = newVisibleRows;
-        visibleProducts = visibleRows * PRODUCTS_PER_ROW;
-        updateVisibleProducts();
-      }
+      addHeartOverlays();
     });
   </script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </body>
 </html>
