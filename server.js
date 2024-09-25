@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const app = express();
 const port = process.env.PORT || 80;
+const appDomain = process.env.APP_DOMAIN || 'localhost';
 
 // 静态文件服务
 app.use(express.static(path.join(__dirname, 'public')));
@@ -13,7 +14,10 @@ app.get('/', (req, res) => {
 
 // 健康检查端点
 app.get('/health', (req, res) => {
-  res.status(200).send('OK');
+  res.status(200).json({
+    status: 'OK',
+    domain: appDomain
+  });
 });
 
 // 错误处理中间件
@@ -23,8 +27,9 @@ app.use((err, req, res, next) => {
 });
 
 // 启动服务器
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server running on port ${port}`);
+  console.log(`Application domain: ${appDomain}`);
   console.log(`Current working directory: ${process.cwd()}`);
   console.log(`Environment: ${process.env.NODE_ENV}`);
 });
